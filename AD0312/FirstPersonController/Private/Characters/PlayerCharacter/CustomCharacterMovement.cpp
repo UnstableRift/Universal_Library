@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/CustomCharacterMovement.h"
+#include "Characters/PlayerCharacter/CustomCharacterMovement.h"
 
 #include "InputActionValue.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/PlayerCharacter/PlayerCharacter.h"
 
 UCustomCharacterMovement::UCustomCharacterMovement()
 {
@@ -41,9 +41,9 @@ void UCustomCharacterMovement::ApplyVelocityBraking(float DeltaTime, float Frict
 void UCustomCharacterMovement::HandleMeshRotation()
 {
 	const FRotator PawnViewRotation = OwningPlayerCharacter->GetViewRotation();
-	if (!PawnViewRotation.Equals(OwningPlayerCharacter->GetArmsMesh()->GetComponentRotation()))
+	if (!PawnViewRotation.Equals(OwningPlayerCharacter->ArmsMesh->GetComponentRotation()))
 	{
-		OwningPlayerCharacter->GetArmsMesh()->SetWorldRotation(PawnViewRotation);
+		OwningPlayerCharacter->ArmsMesh->SetWorldRotation(PawnViewRotation);
 	}
 }
 
@@ -58,11 +58,12 @@ void UCustomCharacterMovement::HandleJumping()
 
 void UCustomCharacterMovement::HandleMeshHeight(float DeltaSeconds)
 {
-
+	if(!OwningPlayerCharacter || !OwningPlayerCharacter->ArmsMesh) return;
+	
 	// Determine the target height based on whether the character is crouching or not
 	const float TargetHeight = IsCrouching() ? CrouchHeight : StandingHeight;
 	
-	const FVector CurrentLocation = OwningPlayerCharacter->GetArmsMesh()->GetRelativeLocation();
+	const FVector CurrentLocation = OwningPlayerCharacter->ArmsMesh->GetRelativeLocation();
 	const float CurrentHeight = CurrentLocation.Z;
 	// Check if the mesh is already at the target height
 	if (CurrentHeight == TargetHeight) {return;}
@@ -76,7 +77,7 @@ void UCustomCharacterMovement::HandleMeshHeight(float DeltaSeconds)
 	{
 		NewLocation.Z = TargetHeight;
 	}
-	OwningPlayerCharacter->GetArmsMesh()->SetRelativeLocation(NewLocation);
+	OwningPlayerCharacter->ArmsMesh->SetRelativeLocation(NewLocation);
 }
 
 void UCustomCharacterMovement::HandleRunning()
